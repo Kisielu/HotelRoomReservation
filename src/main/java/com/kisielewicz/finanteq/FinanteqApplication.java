@@ -21,19 +21,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableSpringDataWebSupport
 @EnableAutoConfiguration(exclude = RepositoryRestMvcAutoConfiguration.class)
 public class FinanteqApplication extends SpringBootServletInitializer {
-//public class FinanteqApplication implements CommandLineRunner {
-//	@Autowired
-//	private static ReservationService reservationService;
-//
-//	@Autowired
-//	private static RoomService roomService;
-
+	
 	public static void main(String[] args) {
 		SpringApplication.run(FinanteqApplication.class, args);
-
-//		SpringApplication app = new SpringApplication(FinanteqApplication.class);
-//		app.setBannerMode(Banner.Mode.OFF);
-//		app.run(args);
 	}
 
 	@Bean
@@ -46,9 +36,4 @@ public class FinanteqApplication extends SpringBootServletInitializer {
 
 		return objectMapper;
 	}
-
-//	@Override
-//	public void run(String... strings) throws Exception {
-//
-//	}
 }
