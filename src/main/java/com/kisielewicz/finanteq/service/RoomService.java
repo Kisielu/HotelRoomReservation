@@ -5,6 +5,7 @@ import com.kisielewicz.finanteq.exceptions.NotFoundException;
 import com.kisielewicz.finanteq.repository.RoomRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -27,14 +28,14 @@ public class RoomService {
         return roomRepository.findAllByIsReserved(isReserved);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Room addNewRoom() {
         Room newRoom = new Room();
         newRoom.setIsReserved(false);
         return roomRepository.save(newRoom);
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void deleteRoom(long roomId) {
         if (roomExists(roomId)) {
             roomRepository.delete(roomId);
@@ -43,7 +44,7 @@ public class RoomService {
         }
     }
 
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public Room setAvailability(long roomId, boolean available) {
         if (roomExists(roomId)) {
             Room room = roomRepository.findOne(roomId);

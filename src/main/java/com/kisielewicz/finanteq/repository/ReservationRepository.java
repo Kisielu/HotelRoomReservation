@@ -14,4 +14,6 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
 
     Iterable<Reservation> findAllByStartDateAfter(LocalDate after);
 
+    Iterable<Reservation> findAllByRoomAndStartDateBeforeAndEndDateAfter(Room room, LocalDate localEndDate, LocalDate localStartDate);
+
 }

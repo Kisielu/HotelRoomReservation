@@ -247,7 +247,8 @@ class ReservationServiceSpecTest extends Specification {
         Reservation result = reservationService.makeReservation(reservationDTO)
         then:
         1*roomRepository.findOne(roomId) >> room
-        1*reservationRepository.findAllByStartDateAfterAndRoom(LocalDate.now().minusDays(1), room) >> reservations
+        1*reservationRepository.findAllByRoomAndStartDateBeforeAndEndDateAfter(
+                room, reservationDTO.getEndDate(), reservationDTO.getStartDate()) >> new ArrayList<>()
         1*reservationRepository.save(_) >> shouldResult
         result.getMail() == reservationDTO.getMail()
     }
@@ -398,7 +399,8 @@ class ReservationServiceSpecTest extends Specification {
         reservationService.makeReservation(reservationDTO)
         then:
         1*roomRepository.findOne(roomId) >> room
-        1*reservationRepository.findAllByStartDateAfterAndRoom(LocalDate.now().minusDays(1), room) >> reservations
+        1*reservationRepository.findAllByRoomAndStartDateBeforeAndEndDateAfter(
+                room, reservationDTO.getEndDate(), reservationDTO.getStartDate()) >> reservations
         ConflictException e = thrown()
         e.getMessage() == "Reservation for this room is already created for desired date range."
         0*reservationRepository.save(_) >> shouldResult
@@ -447,7 +449,8 @@ class ReservationServiceSpecTest extends Specification {
         then:
         1*reservationRepository.findOne(reservationId) >> oldReservation
         1*roomRepository.findOne(roomId) >> room
-        1*reservationRepository.findAllByStartDateAfterAndRoom(LocalDate.now().minusDays(1), room) >> reservations
+        1*reservationRepository.findAllByRoomAndStartDateBeforeAndEndDateAfter(
+                room, reservationDTO.getEndDate(), reservationDTO.getStartDate()) >> new ArrayList<>()
         1*reservationRepository.save(_) >> shouldResult
         result.getMail() == reservationDTO.getMail()
     }
