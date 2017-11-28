@@ -24,11 +24,13 @@ public class RoomService {
         this.roomRepository = roomRepository;
     }
 
+    @Transactional(readOnly = true)
     public Iterable<Room> getAllRooms() {
         LOGGER.info("Getting all rooms from DB");
         return roomRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public Iterable<Room> getAllRoomsBasedOnReservation(Boolean isReserved) {
         LOGGER.info("Getting all rooms by reserved status: {}", isReserved);
         return roomRepository.findAllByIsReserved(isReserved);

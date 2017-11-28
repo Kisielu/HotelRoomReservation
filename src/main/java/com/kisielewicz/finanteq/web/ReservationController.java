@@ -55,7 +55,7 @@ public class ReservationController {
         return reservationService.makeReservation(reservationDTO);
     }
 
-    @DeleteMapping("/{reservationId}/cancel")
+    @DeleteMapping("/cancel/{reservationId}")
     public @ResponseBody
     ResponseEntity cancelReservation(@PathVariable long reservationId) {
         reservationService.cancelReservation(reservationId);

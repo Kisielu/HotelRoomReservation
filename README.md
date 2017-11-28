@@ -1,11 +1,20 @@
 # Hotel room reservation service
 
+### Running the application
+
 To run the application, you need to have MySQL server installed and created a schema called finanteq, 
 with user finanteq:finanteq to access the database (or change the properties to your discretion).
 
 Once you satisfy the prerequisites, simply run `mvn spring-boot:run` in your console
 
 All API informations are handled by swagger, in default case: `localhost:8080/swagger-ui.html`
+
+### Test scenario
+
+Test scenario can be run in two steps:
+
+- Launch application
+- Run FinanteqApplicationTests
 
 The API methods for test scenario are:
 

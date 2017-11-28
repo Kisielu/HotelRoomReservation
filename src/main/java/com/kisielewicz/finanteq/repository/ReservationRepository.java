@@ -8,8 +8,6 @@ import java.time.LocalDate;
 
 public interface ReservationRepository extends CrudRepository<Reservation, Long> {
 
-    Iterable<Reservation> findAllByStartDateAfterAndRoom(LocalDate after, Room room);
-
     Iterable<Reservation> findAllByStartDate(LocalDate localDate);
 
     Iterable<Reservation> findAllByEndDate(LocalDate localDate);
