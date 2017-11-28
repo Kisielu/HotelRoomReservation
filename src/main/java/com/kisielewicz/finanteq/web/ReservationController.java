@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @RequestMapping("/reservations")
 public class ReservationController {
 
-    private ReservationService reservationService;
+    private final ReservationService reservationService;
 
     @Autowired
     public ReservationController(ReservationService reservationService) {
@@ -39,9 +39,15 @@ public class ReservationController {
         return reservationService.getAllReservationsForRoom(roomId);
     }
 
-    @GetMapping("/upcoming/{forDate}")
+    @GetMapping("/upcoming/date/{forDate}")
     public @ResponseBody Iterable<Reservation> getUpcomingReservations(@PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate forDate) {
         return reservationService.getUpcomingReservations(forDate);
+    }
+
+    @GetMapping("/upcoming/room/{roomId}/date/{forDate}")
+    public @ResponseBody Iterable<Reservation> getUpcomingReservationsForRoom(@PathVariable long roomId,
+                                                                              @PathVariable @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate forDate) {
+        return reservationService.getUpcomingReservationsForRoom(forDate, roomId);
     }
 
     @PostMapping("/make")

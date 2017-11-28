@@ -87,8 +87,7 @@ class ReservationServiceSpecTest extends Specification {
         when:
         Iterable<Reservation> result = reservationService.getAllReservationsForRoom(res)
         then:
-        1*roomRepository.findOne(res) >> room
-        1*reservationRepository.findAllByRoom(room) >> reservations
+        1*reservationRepository.findAllByRoom_Id(res) >> reservations
         result.size() == 2
         result[1].room.id == res
     }
@@ -109,21 +108,8 @@ class ReservationServiceSpecTest extends Specification {
         when:
         Iterable<Reservation> result = reservationService.getAllReservationsForRoom(res)
         then:
-        1*roomRepository.findOne(res) >> room
-        1*reservationRepository.findAllByRoom(room) >> new ArrayList<>()
+        1*reservationRepository.findAllByRoom_Id(res) >> new ArrayList<>()
         result.size() == 0
-    }
-
-    def "should throw NotFoundException when no room found"() {
-        given:
-        int res = 1
-        when:
-        Iterable<Reservation> result = reservationService.getAllReservationsForRoom(res)
-        then:
-        NotFoundException e = thrown()
-        1*roomRepository.findOne(res) >> null
-        0*reservationRepository.findAllByRoom(_)
-        e.getMessage() == "No room by id:1 found."
     }
 
     def "should find all reservations with date after some date"() {
@@ -143,7 +129,7 @@ class ReservationServiceSpecTest extends Specification {
         when:
         Iterable<Reservation> result = reservationService.getUpcomingReservations(LocalDate.now())
         then:
-        1*reservationRepository.findAllByStartDateAfter(LocalDate.now()) >> reservations
+        1*reservationRepository.findAllByStartDateAfter(LocalDate.now().minusDays(1)) >> reservations
         result.size() == 2
         result[0].startDate == reservations[0].startDate
     }
@@ -153,7 +139,41 @@ class ReservationServiceSpecTest extends Specification {
         when:
         Iterable<Reservation> result = reservationService.getUpcomingReservations(LocalDate.now())
         then:
-        1*reservationRepository.findAllByStartDateAfter(LocalDate.now()) >> new ArrayList<>()
+        1*reservationRepository.findAllByStartDateAfter(LocalDate.now().minusDays(1)) >> new ArrayList<>()
+        result.size() == 0
+    }
+
+    def "should find all reservations for room with date after some date"() {
+        given:
+        int res = 1
+        Reservation reservation
+        Room room
+        Iterable<Reservation> reservations = new ArrayList<>()
+        for (int i = 0; i < 2; i++) {
+            room = new Room()
+            room.setId(i)
+            reservation = new Reservation()
+            reservation.setId(i)
+            reservation.setRoom(room)
+            reservation.setStartDate(LocalDate.now().plusDays(i+1))
+            reservations.add(reservation)
+        }
+        Iterable<Reservation> shouldResult = Collections.singletonList(reservations[res])
+        when:
+        Iterable<Reservation> result = reservationService.getUpcomingReservationsForRoom(LocalDate.now(), res)
+        then:
+        1*reservationRepository.findAllByStartDateAfterAndRoom_Id(LocalDate.now().minusDays(1), res) >> shouldResult
+        result.size() == 1
+        result[0].startDate == shouldResult[0].startDate
+    }
+
+    def "should find no reservations for room with date specified"() {
+        given:
+        long res = 1
+        when:
+        Iterable<Reservation> result = reservationService.getUpcomingReservationsForRoom(LocalDate.now(), res)
+        then:
+        1*reservationRepository.findAllByStartDateAfterAndRoom_Id(LocalDate.now().minusDays(1),res) >> new ArrayList<>()
         result.size() == 0
     }
 
@@ -287,7 +307,6 @@ class ReservationServiceSpecTest extends Specification {
         1*roomRepository.findOne(roomId) >> null
         NotFoundException e = thrown()
         e.getMessage() == "No room by id:" + roomId + " found."
-        0*reservationRepository.findAllByStartDateAfterAndRoom(LocalDate.now().minusDays(1), room) >> reservations
         0*reservationRepository.save(_) >> shouldResult
     }
 
@@ -322,10 +341,9 @@ class ReservationServiceSpecTest extends Specification {
         when:
         reservationService.makeReservation(reservationDTO)
         then:
-        1*roomRepository.findOne(roomId) >> room
         ConflictException e = thrown()
         e.getMessage() == "Date range input is wrong."
-        0*reservationRepository.findAllByStartDateAfterAndRoom(LocalDate.now().minusDays(1), room) >> reservations
+        0*roomRepository.findOne(roomId) >> room
         0*reservationRepository.save(_) >> shouldResult
     }
 
@@ -360,10 +378,9 @@ class ReservationServiceSpecTest extends Specification {
         when:
         reservationService.makeReservation(reservationDTO)
         then:
-        1*roomRepository.findOne(roomId) >> room
         ConflictException e = thrown()
         e.getMessage() == "Can't make reservation with start date before today."
-        0*reservationRepository.findAllByStartDateAfterAndRoom(LocalDate.now().minusDays(1), room) >> reservations
+        0*roomRepository.findOne(roomId) >> room
         0*reservationRepository.save(_) >> shouldResult
     }
 
